@@ -20,7 +20,7 @@ func respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
 
 func responsdWithError(w http.ResponseWriter, code int, msg string) {
 	if code > 499 {
-		log.Fatal("Responding with 5xx error: ", msg)
+		log.Fatalf("Responding with 5xx error: %v", msg)
 	}
 	type errResponse struct {
 		Error string `json:"error"`
