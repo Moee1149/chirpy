@@ -168,6 +168,27 @@ func main() {
 		}
 		respondWithJSON(w, 200, chirps)
 	})
+	mux.HandleFunc("GET /api/chirps/{chirpID}", func(w http.ResponseWriter, r *http.Request) {
+		pathValue := r.PathValue("chirpID")
+		chirpId, err := uuid.Parse(pathValue)
+		if err != nil {
+			responsdWithError(w, 400, "Invalid user_id format")
+			return
+		}
+		chirp, err := apiConfig.dbQueries.GetChirpsById(r.Context(), chirpId)
+		if err != nil {
+			responsdWithError(w, 400, fmt.Sprintf("Error getting chirps: %v", err))
+			return
+		}
+		resp := chirpSchema{
+			ID:        chirp.ID.String(),
+			CreateAt:  chirp.CreatedAt.UTC().Format("2006-01-0215:04:05Z"),
+			UpdatedAt: chirp.UpdatedAt.UTC().Format("2006-01-0215:04:05Z"),
+			Body:      chirp.Body,
+			UserId:    chirp.UserID.String(),
+		}
+		respondWithJSON(w, 200, resp)
+	})
 
 	fmt.Printf("Server running on port %v\n", server.Addr)
 
